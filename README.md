@@ -41,16 +41,16 @@
 ##  Quick Start
 
 ### Run Locally (No Install)
-`ash
+
 # Just open the file in your browser
 start index.html
-`
+
 
 Or use a local server:
-`ash
+
 python -m http.server 8000
 # Visit http://localhost:8000
-`
+
 
 ### Deploy to GitHub Pages
 1. Push this repo to GitHub
@@ -74,11 +74,11 @@ python -m http.server 8000
 ##  Local AI Setup (Optional)
 
 ### Using Ollama
-`ash
+
 # Install Ollama (https://ollama.ai)
 ollama pull deepseek-r1:1.5b
 ollama serve
-`
+
 
 ### Using LM Studio
 1. Download [LM Studio](https://lmstudio.ai/)
@@ -95,7 +95,7 @@ ollama serve
 
 ##  Project Structure
 
-`
+'
 flappy-pro/
  index.html       # Main page layout
  styles.css       # Sci-fi styling & responsive design

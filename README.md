@@ -171,6 +171,3 @@ MIT License — feel free to fork, modify, and distribute.
 - [ ] Multiplayer mode
 - [ ] Progressive Web App (PWA)
 
----
-
-**Ready for launch.** Push to GitHub and enjoy! 🎮

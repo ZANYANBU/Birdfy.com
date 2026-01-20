@@ -100,8 +100,40 @@ const comedyLines = [
   "Sci‑fi tip: oxygen is overrated, altitude is mandatory.",
   "Warning: sarcasm detected at 1200 rpm.",
   "Pilot morale: 97% (remaining 3% is stuck in the pipe).",
-  "Quantum tip: you both crashed and didn’t crash. Press restart anyway.",
+  "Quantum tip: you both crashed and didn't crash. Press restart anyway.",
 ];
+
+// Particle System for collision effects
+class Particle {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.size = Math.random() * 5 + 2;
+    this.speedX = Math.random() * 6 - 3;
+    this.speedY = Math.random() * 6 - 3;
+    this.color = '#f8fdff'; // Matches the bird's glow
+    this.opacity = 1;
+  }
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+    this.speedY += 0.15; // Add gravity to particles
+    this.opacity -= 0.02;
+  }
+  draw() {
+    ctx.save();
+    ctx.globalAlpha = this.opacity;
+    ctx.fillStyle = this.color;
+    ctx.shadowColor = 'rgba(82,240,255,0.8)';
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+let particles = [];
 
 function resizeCanvas() {
   const rect = canvas.getBoundingClientRect();
@@ -129,6 +161,7 @@ function resetGame() {
   control.lastFlapTime = 0;
   pipes = [];
   trails = [];
+  particles = [];
   frameCount = 0;
   state.score = 0;
   state.gameOver = false;
@@ -301,6 +334,10 @@ function triggerGameOver() {
   if (state.gameOver) return;
   state.gameOver = true;
   playNote(150, "sawtooth", 0.5);
+  // Create a burst of particles at collision point
+  for (let i = 0; i < 25; i++) {
+    particles.push(new Particle(bird.x, bird.y));
+  }
   finalScoreText.textContent = `Final Score: ${state.score}`;
   gameOverOverlay.classList.remove("hidden");
   saveScore(state.score);
@@ -421,6 +458,15 @@ function draw() {
   drawTrails();
   drawPipes();
   drawBird();
+
+  // Update and draw particles
+  for (let i = particles.length - 1; i >= 0; i--) {
+    particles[i].update();
+    particles[i].draw();
+    if (particles[i].opacity <= 0) {
+      particles.splice(i, 1);
+    }
+  }
 
   if (!state.gameStarted) {
     ctx.fillStyle = "rgba(255,255,255,0.8)";

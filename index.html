@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Flappy Bird Pro — Sci‑Fi Edition</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <main id="gameArea">
+      <canvas id="gameCanvas"></canvas>
+      <div id="hud">
+        <div class="hud-pill" id="authorCredit">This is made by ANBU</div>
+        <div class="hud-row">
+          <div class="hud-pill" id="modeDisplay">Mode: Normal</div>
+          <div class="hud-pill" id="scoreDisplay">Score: 0</div>
+          <div class="hud-pill" id="bestDisplay">Best: 0</div>
+        </div>
+        <div id="comedyTicker">Welcome pilot. Press SPACE to ignite.</div>
+        <div class="hud-row">
+          <button id="startBtn" class="primary">Start</button>
+          <div class="segmented" role="group" aria-label="Difficulty">
+            <button class="seg-btn" data-difficulty="easy">Easy</button>
+            <button class="seg-btn active" data-difficulty="medium">Medium</button>
+            <button class="seg-btn" data-difficulty="hard">Hard</button>
+          </div>
+          <button id="restartBtn">Restart</button>
+          <button id="muteBtn">Audio: On</button>
+        </div>
+        <div class="hud-row">
+          <div class="gravity-control">
+            <label for="gravitySlider">Gravity</label>
+            <input id="gravitySlider" type="range" min="0.3" max="1.4" step="0.05" value="0.6" />
+            <span id="gravityValue">0.60</span>
+          </div>
+        </div>
+        <div id="controlHints" class="hud-pill">Controls: SPACE/UP flap · Enter restart</div>
+      </div>
+      <div id="gameOverOverlay" class="hidden">
+        <div class="panel">
+          <h2>Mission Failed</h2>
+          <p id="finalScoreText">Final Score: 0</p>
+          <p>Press ENTER or Restart</p>
+        </div>
+      </div>
+    </main>
+
+    <aside id="sidebar">
+      <section class="card">
+        <h3>Neo‑Bird Console</h3>
+        <p class="muted">Ask how to play or request a comedy break.</p>
+        <div id="chatLog"></div>
+        <div class="chat-input">
+          <input id="chatInput" type="text" placeholder="Ask the sidekick..." />
+          <button id="sendBtn" class="primary">Send</button>
+        </div>
+        <div class="quick-actions">
+          <button data-quick="how">How to play?</button>
+          <button data-quick="tips">Hard mode tips</button>
+          <button data-quick="controls">Controls</button>
+          <button data-quick="joke">Tell me a joke</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Local DeepSeek (Optional)</h3>
+        <p class="muted">Uses a local server if available.</p>
+        <label class="row">
+          <input type="checkbox" id="useLocalModel" />
+          <span>Use local DeepSeek 1.5B</span>
+        </label>
+        <label class="stack">
+          <span>Preset</span>
+          <select id="endpointPreset">
+            <option value="ollama">Ollama (localhost)</option>
+            <option value="lmstudio">LM Studio (localhost)</option>
+            <option value="custom">Custom</option>
+          </select>
+        </label>
+        <label class="stack">
+          <span>Endpoint</span>
+          <input id="endpointInput" type="text" value="http://localhost:11434/api/generate" />
+        </label>
+        <label class="stack">
+          <span>Model</span>
+          <input id="modelInput" type="text" value="deepseek-r1:1.5b" />
+        </label>
+        <div class="inline-actions">
+          <button id="testModelBtn">Test Local Model</button>
+          <span id="modelStatus" class="status muted">Not tested</span>
+        </div>
+        <p class="muted tiny">Set your local endpoint and model name.</p>
+        <div class="steps">
+          <div class="step"><span>1</span> Install a local model runtime (Ollama or LM Studio).</div>
+          <div class="step"><span>2</span> Pull a 1.5B DeepSeek model.</div>
+          <div class="step"><span>3</span> Start the server and press “Test Local Model”.</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Score Recorder</h3>
+        <div id="scoreHistory"></div>
+        <button id="resetScoresBtn">Reset Scores</button>
+      </section>
+    </aside>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

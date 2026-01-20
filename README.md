@@ -213,4 +213,3 @@ Issues and pull requests are welcome! For major changes, please open an issue fi
 
 ---
 
-**Ready for launch.** Push to GitHub and enjoy! 

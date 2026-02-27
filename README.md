@@ -1,4 +1,4 @@
-# � Birdfy — From HTML Script to iOS App
+ Birdfy — From HTML Script to iOS App
 
 > **Created by V Anbu Chelvan (ZANYANBU)**
 > A tribute to Flappy Bird that evolved from a single HTML file into a full-featured iOS native game.
@@ -10,7 +10,7 @@
 
 | Gameplay | Main Menu | Custom Background |
 |:---:|:---:|:---:|
-| ![Gameplay](screenshots/gameplay.png) | ![Menu](screenshots/menu.png) | ![Custom BG](screenshots/custombg.png) |
+| ![Gameplay](screenshots/menu costum backgroung.jpeg) | ![Menu](screenshots/menu.png.jpeg) | ![Custom BG](screenshots/WhatsApp Image 2026-02-27 at 20.32.11.jpeg) |
 
 > **To add your own screenshots:** place `.png` files in a `screenshots/` folder at the root of the repo and they will appear here automatically.
 

@@ -68,6 +68,21 @@ body {
   font-size: 14px;
 }
 
+.theme-select {
+  appearance: none;
+  cursor: pointer;
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(4, 8, 16, 0.85);
+  font-weight: 600;
+  text-align: center;
+  min-width: 140px;
+}
+
+.theme-select:hover {
+  background: rgba(69, 230, 255, 0.15);
+}
+
 #comedyTicker {
   padding: 10px 14px;
   border-radius: 12px;

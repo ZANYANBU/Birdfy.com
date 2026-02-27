@@ -14,6 +14,7 @@ const restartBtn = document.getElementById("restartBtn");
 const muteBtn = document.getElementById("muteBtn");
 const gravitySlider = document.getElementById("gravitySlider");
 const gravityValue = document.getElementById("gravityValue");
+const themeSelector = document.getElementById("themeSelector");
 
 const chatLog = document.getElementById("chatLog");
 const chatInput = document.getElementById("chatInput");
@@ -33,17 +34,18 @@ const resetScoresBtn = document.getElementById("resetScoresBtn");
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let audioEnabled = true;
 
-const storageKey = "flappyProScoresV1";
+const storageKey = "flappyProScoresV2"; // Updated key for new leaderboard format
 
 const state = {
   difficulty: "medium",
+  theme: "scifi",
   settings: null,
   gravityOverride: null,
   gameStarted: false,
   gameOver: false,
   score: 0,
   bestScore: 0,
-  history: [],
+  history: [], // Now stored as { score, time, theme }
 };
 
 const bird = {
@@ -90,9 +92,36 @@ const tips = {
 };
 
 const difficulties = {
-  easy: { gravity: 0.45, lift: -10.5, pipeGap: 230, pipeFreq: 125, pipeSpeed: 2.8 },
-  medium: { gravity: 0.6, lift: -11.5, pipeGap: 200, pipeFreq: 110, pipeSpeed: 3.2 },
-  hard: { gravity: 0.95, lift: -14.5, pipeGap: 155, pipeFreq: 80, pipeSpeed: 4.8 },
+  easy: { gravity: 0.35, lift: -9.5, pipeGap: 260, pipeFreq: 140, pipeSpeed: 2.2 },
+  medium: { gravity: 0.55, lift: -11.0, pipeGap: 190, pipeFreq: 110, pipeSpeed: 3.2 },
+  hard: { gravity: 0.85, lift: -14.0, pipeGap: 145, pipeFreq: 80, pipeSpeed: 4.8 },
+};
+
+const themes = {
+  scifi: {
+    bg: ['#0b1b36', '#08121f', '#04060e'],
+    bird: ['#f8fdff', '#8bdcff', '#4a62ff'],
+    pipe: ['#2ee6ff', '#6c3bff'],
+    text: '#45e6ff',
+  },
+  retro: {
+    bg: ['#2c3e50', '#34495e', '#2c3e50'],
+    bird: ['#f1c40f', '#f39c12', '#e67e22'],
+    pipe: ['#2ecc71', '#27ae60'],
+    text: '#e74c3c',
+  },
+  modern: {
+    bg: ['#ecf0f1', '#bdc3c7', '#95a5a6'],
+    bird: ['#e74c3c', '#c0392b', '#922b21'],
+    pipe: ['#3498db', '#2980b9'],
+    text: '#2c3e50',
+  },
+  classic: {
+    bg: ['#70c5ce', '#70c5ce', '#ded895'],
+    bird: ['#ffd93b', '#ff9f2c', '#d35400'],
+    pipe: ['#73bf2e', '#558c22'],
+    text: '#ffffff',
+  }
 };
 
 const comedyLines = [
@@ -279,8 +308,14 @@ function update(delta) {
   bird.velocity += bird.gravity;
   bird.velocity *= 0.985;
   bird.y += bird.velocity;
-  bird.rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 3, bird.velocity * 0.04));
-  bird.flapPhase += delta * 0.02;
+  
+  // Smoother rotation logic
+  let targetRotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 2.5, (bird.velocity * 0.1)));
+  bird.rotation = bird.rotation + (targetRotation - bird.rotation) * 0.1;
+  
+  // Smart flap speed: faster when rising
+  const flapSpeed = bird.velocity < 0 ? 0.035 : 0.012;
+  bird.flapPhase += delta * flapSpeed;
 
   const pipeFreq = state.settings.pipeFreq;
   if (frameCount % pipeFreq === 0) createPipe();
@@ -350,96 +385,163 @@ function updateHUD() {
 }
 
 function drawBackground() {
+  const currentTheme = themes[state.theme] || themes.scifi;
   const gradient = ctx.createLinearGradient(0, 0, 0, window.innerHeight);
-  gradient.addColorStop(0, "#0b1b36");
-  gradient.addColorStop(0.5, "#08121f");
-  gradient.addColorStop(1, "#04060e");
+  
+  if (state.theme === 'classic') {
+    // Classic specific bg
+    gradient.addColorStop(0, currentTheme.bg[0]);
+    gradient.addColorStop(0.7, currentTheme.bg[1]);
+    gradient.addColorStop(0.7, currentTheme.bg[2]);
+    gradient.addColorStop(1, currentTheme.bg[2]);
+  } else {
+    gradient.addColorStop(0, currentTheme.bg[0]);
+    gradient.addColorStop(0.5, currentTheme.bg[1]);
+    gradient.addColorStop(1, currentTheme.bg[2]);
+  }
+  
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
-  ctx.save();
-  ctx.fillStyle = "rgba(82, 240, 255, 0.6)";
-  stars.forEach((star) => {
-    ctx.globalAlpha = star.alpha;
-    ctx.beginPath();
-    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-    ctx.fill();
-  });
-  ctx.restore();
+  if (state.theme === 'scifi') {
+    ctx.save();
+    ctx.fillStyle = "rgba(82, 240, 255, 0.6)";
+    stars.forEach((star) => {
+      ctx.globalAlpha = star.alpha;
+      ctx.beginPath();
+      ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.restore();
 
-  ctx.save();
-  ctx.strokeStyle = "rgba(82, 240, 255, 0.1)";
-  for (let i = 0; i < 6; i++) {
+    ctx.save();
+    ctx.strokeStyle = "rgba(82, 240, 255, 0.1)";
+    for (let i = 0; i < 6; i++) {
+        ctx.beginPath();
+        ctx.moveTo(0, i * 120 + (frameCount % 120));
+        ctx.lineTo(window.innerWidth, i * 120 + (frameCount % 120));
+        ctx.stroke();
+    }
+    ctx.restore();
+  } else if (state.theme === 'classic') {
+    // Add some clouds for classic mode
+    ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+    for (let i = 0; i < 5; i++) {
+        const x = ((frameCount * 0.5) + (i * 300)) % (window.innerWidth + 200) - 100;
+        const y = 100 + (i * 50) % 200;
+        ctx.beginPath();
+        ctx.arc(x, y, 30, 0, Math.PI * 2);
+        ctx.arc(x + 25, y - 10, 40, 0, Math.PI * 2);
+        ctx.arc(x + 50, y, 30, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    
+    // Classic ground
+    ctx.fillStyle = "#ded895";
+    ctx.fillRect(0, window.innerHeight - 50, window.innerWidth, 50);
+    ctx.strokeStyle = "#558c22";
     ctx.beginPath();
-    ctx.moveTo(0, i * 120 + (frameCount % 120));
-    ctx.lineTo(window.innerWidth, i * 120 + (frameCount % 120));
+    ctx.moveTo(0, window.innerHeight - 50);
+    ctx.lineTo(window.innerWidth, window.innerHeight - 50);
     ctx.stroke();
   }
-  ctx.restore();
 }
 
 function drawPipes() {
-  const isHard = state.difficulty === "hard";
+  const currentTheme = themes[state.theme] || themes.scifi;
   pipes.forEach((pipe) => {
     const glow = ctx.createLinearGradient(pipe.x, 0, pipe.x + pipe.width, 0);
-    glow.addColorStop(0, isHard ? "#ff5d9e" : "#2ee6ff");
-    glow.addColorStop(1, "#6c3bff");
-    ctx.fillStyle = glow;
-
-    ctx.fillRect(pipe.x, 0, pipe.width, pipe.topHeight);
-    ctx.fillRect(pipe.x, pipe.topHeight + pipe.gap, pipe.width, window.innerHeight);
-
-    ctx.strokeStyle = "rgba(0,0,0,0.4)";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(pipe.x, 0, pipe.width, pipe.topHeight);
-    ctx.strokeRect(pipe.x, pipe.topHeight + pipe.gap, pipe.width, window.innerHeight);
+    
+    if (state.theme === 'scifi') {
+      const isHard = state.difficulty === "hard";
+      glow.addColorStop(0, isHard ? "#ff5d9e" : currentTheme.pipe[0]);
+      glow.addColorStop(1, currentTheme.pipe[1]);
+      ctx.fillStyle = glow;
+      ctx.fillRect(pipe.x, 0, pipe.width, pipe.topHeight);
+      ctx.fillRect(pipe.x, pipe.topHeight + pipe.gap, pipe.width, window.innerHeight);
+      
+      ctx.strokeStyle = "rgba(0,0,0,0.4)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(pipe.x, 0, pipe.width, pipe.topHeight);
+      ctx.strokeRect(pipe.x, pipe.topHeight + pipe.gap, pipe.width, window.innerHeight);
+    } else {
+      // Classic/Retro/Modern Pipes
+      ctx.fillStyle = currentTheme.pipe[0];
+      ctx.fillRect(pipe.x, 0, pipe.width, pipe.topHeight);
+      ctx.fillRect(pipe.x, pipe.topHeight + pipe.gap, pipe.width, window.innerHeight);
+      
+      // Pipe cap
+      ctx.fillStyle = currentTheme.pipe[1];
+      ctx.fillRect(pipe.x - 2, pipe.topHeight - 20, pipe.width + 4, 20);
+      ctx.fillRect(pipe.x - 2, pipe.topHeight + pipe.gap, pipe.width + 4, 20);
+      
+      ctx.strokeStyle = "#000";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(pipe.x, 0, pipe.width, pipe.topHeight);
+      ctx.strokeRect(pipe.x, pipe.topHeight + pipe.gap, pipe.width, window.innerHeight);
+    }
   });
 }
 
 function drawBird() {
+  const currentTheme = themes[state.theme] || themes.scifi;
+  
   ctx.save();
   ctx.translate(bird.x, bird.y);
   ctx.rotate(bird.rotation);
 
   const bodyGradient = ctx.createLinearGradient(-20, -20, 25, 20);
-  bodyGradient.addColorStop(0, "#f8fdff");
-  bodyGradient.addColorStop(0.4, "#8bdcff");
-  bodyGradient.addColorStop(1, "#4a62ff");
+  bodyGradient.addColorStop(0, currentTheme.bird[0]);
+  bodyGradient.addColorStop(0.4, currentTheme.bird[1]);
+  bodyGradient.addColorStop(1, currentTheme.bird[2]);
 
-  ctx.shadowColor = "rgba(82,240,255,0.8)";
-  ctx.shadowBlur = 18;
+  if (state.theme === 'scifi') {
+      ctx.shadowColor = "rgba(82,240,255,0.8)";
+      ctx.shadowBlur = 18;
+  }
 
+  // Bird Body
   ctx.fillStyle = bodyGradient;
   ctx.beginPath();
-  ctx.ellipse(0, 0, 22, 15, 0, 0, Math.PI * 2);
+  ctx.ellipse(0, 0, 22, 16, 0, 0, Math.PI * 2);
   ctx.fill();
 
   ctx.shadowBlur = 0;
-  ctx.strokeStyle = "rgba(255,255,255,0.4)";
+  ctx.strokeStyle = "rgba(0,0,0,0.2)";
+  ctx.lineWidth = 2;
   ctx.stroke();
 
+  // Eye
   ctx.fillStyle = "#ffffff";
   ctx.beginPath();
-  ctx.arc(10, -5, 5, 0, Math.PI * 2);
+  ctx.arc(10, -6, 6, 0, Math.PI * 2);
   ctx.fill();
+  
+  // Pupil
   ctx.fillStyle = "#03070f";
   ctx.beginPath();
-  ctx.arc(12, -5, 2, 0, Math.PI * 2);
+  ctx.arc(12 + (bird.velocity * 0.1), -6, 2.5, 0, Math.PI * 2); // Pupil moves with velocity
   ctx.fill();
 
-  ctx.fillStyle = "#f7b500";
+  // Beak
+  ctx.fillStyle = state.theme === 'classic' ? "#e55039" : "#f7b500";
   ctx.beginPath();
   ctx.moveTo(18, 0);
-  ctx.lineTo(30, 6);
+  ctx.lineTo(32, 6);
   ctx.lineTo(18, 12);
   ctx.closePath();
   ctx.fill();
+  ctx.stroke();
 
-  const wingOffset = Math.sin(bird.flapPhase) * 6;
-  ctx.fillStyle = "rgba(255,255,255,0.65)";
+  // Wing - Animated based on flapPhase
+  const wingY = Math.sin(bird.flapPhase) * 8; 
+  
+  ctx.fillStyle = state.theme === 'scifi' ? "rgba(255,255,255,0.65)" : "#fff";
   ctx.beginPath();
-  ctx.ellipse(-10, wingOffset, 12, 6, 0.2, 0, Math.PI * 2);
+  // Draw a more wing-like shape
+  ctx.ellipse(-6, 2 + wingY, 14, 8, 0.2, 0, Math.PI * 2);
   ctx.fill();
+  ctx.stroke();
 
   ctx.restore();
 }
@@ -571,10 +673,19 @@ async function handleSend(text) {
 
 function saveScore(score) {
   const normalizedScore = Number(score) || 0;
-  const entry = { score: normalizedScore, time: new Date().toLocaleString() };
-  state.history.unshift(entry);
-  state.history = state.history.slice(0, 6);
-  state.bestScore = Math.max(Number(state.bestScore) || 0, normalizedScore);
+  // Use state.theme or fallback
+  const currentTheme = themeSelector ? themeSelector.value : "scifi";
+  const entry = { score: normalizedScore, time: new Date().toLocaleTimeString(), theme: currentTheme };
+  
+  // Add new score to history
+  state.history.push(entry);
+  
+  // Sort descending by score, keep only top 10
+  state.history.sort((a, b) => b.score - a.score);
+  state.history = state.history.slice(0, 10);
+  
+  state.bestScore = state.history.length > 0 ? state.history[0].score : 0;
+  
   localStorage.setItem(storageKey, JSON.stringify({
     bestScore: state.bestScore,
     history: state.history,
@@ -603,7 +714,8 @@ function renderScoreHistory() {
   state.history.forEach((entry, index) => {
     const row = document.createElement("div");
     row.className = "score-item";
-    row.innerHTML = `<span>#${index + 1} · ${entry.score}</span><span>${entry.time}</span>`;
+    const medal = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `#${index + 1}`;
+    row.innerHTML = `<span>${medal} · ${entry.score}</span><span style="font-size: 11px; opacity: 0.7">${entry.theme} · ${entry.time}</span>`;
     scoreHistory.appendChild(row);
   });
   bestDisplay.textContent = `Best: ${state.bestScore}`;
@@ -660,6 +772,15 @@ gravitySlider.addEventListener("input", () => {
   bird.gravity = value;
   gravityValue.textContent = value.toFixed(2);
 });
+
+themeSelector.addEventListener("change", () => {
+  state.theme = themeSelector.value;
+  // Redraw immediately to show theme change even if paused
+  if (!state.gameStarted) {
+    draw();
+  }
+});
+
 
 endpointPreset.addEventListener("change", () => {
   const preset = endpointPreset.value;

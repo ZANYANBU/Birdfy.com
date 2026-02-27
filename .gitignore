@@ -1,0 +1,25 @@
+# Web dependencies
+node_modules/
+package-lock.json
+
+# Mobile dependencies (Expo / React Native)
+BirdfyMobile/node_modules/
+BirdfyMobile/package-lock.json
+BirdfyMobile/.expo/
+BirdfyMobile/android/
+BirdfyMobile/ios/
+BirdfyMobile/.next/
+
+# Build outputs
+dist/
+build/
+*.orig.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local
+

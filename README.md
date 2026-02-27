@@ -10,9 +10,9 @@
 
 | Gameplay | Main Menu | Custom Background |
 |:---:|:---:|:---:|
-| ![Gameplay](screenshots/gameplay.png) | ![Menu](screenshots/menu.png) | ![Custom BG](screenshots/custombg.png) |
+| ![Gameplay](screenshots/gameplay.jpeg) | ![Menu](screenshots/menu.jpeg) | ![Custom BG](screenshots/custom-background.jpeg) |
 
-> **To add your own screenshots:** place `.png` files in a `screenshots/` folder at the root of the repo and they will appear here automatically.
+> **To add your own screenshots:** place image files in the `screenshots/` folder and update the table above to reference them.
 
 ---
 

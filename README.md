@@ -10,7 +10,7 @@
 
 | Gameplay | Main Menu | Custom Background |
 |:---:|:---:|:---:|
-| ![Gameplay](screenshots/menucostumbackgroung.jpeg) | ![Menu](screenshots/menu.png.jpeg) | ![Custom BG](screenshots/WhatsAppImage2026-02-27at20.32.11.jpeg) |
+| ![Gameplay](screenshots/screenshotsmenucostumbackgroung.jpeg.jpeg) | ![Menu](screenshots/menu.png.jpeg) | ![Custom BG](screenshots/WhatsAppImage2026-02-27at20.32.11.jpeg) |
 
 > **To add your own screenshots:** place `.png` files in a `screenshots/` folder at the root of the repo and they will appear here automatically.
 

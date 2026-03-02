@@ -18,7 +18,7 @@
 
 ## 🌐 Play It Now (Web)
 
-🔗 **Live Demo:** [https://zanyanbu.github.io/Birdfy.com/](https://zanyanbu.github.io/Birdfy.com/)
+🔗 **Live Demo:** [https://zanyanbu.github.io/Birdfy.com/](https://deploy-preview-2--glistening-cactus-8ee814.netlify.app/)
 
 Open `index.html` directly in any browser — **no install needed**.
 

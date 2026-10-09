@@ -7,6 +7,8 @@
 name: EAS Build — Android Preview
 
 on:
+  # Run it by hand from the Actions tab as well.
+  workflow_dispatch:
   push:
     branches:
       - main
